@@ -2,7 +2,13 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
+include "common" {
+  path   = find_in_parent_folders("common.hcl")
+  expose = true
+}
+
 locals {
+  repository_url = try(include.common.locals.repository_url, null)
   defaults = {
     version      = "main"
     name         = "default-repo"
@@ -18,7 +24,7 @@ locals {
 }
 
 terraform {
-  source = "github.com/proxmox-home-lab/infrastructure-catalog.git//modules/github-repository?ref=${local.values.version}"
+  source = "${local.repository_url}//modules/github-repository?ref=${local.values.version}"
 }
 
 inputs = local.values
