@@ -50,14 +50,32 @@ locals {
 
   caller_values = try(values, {})
 
+  # import_id is a Terragrunt-only field used to generate an OpenTofu import block
+  # for repos that already exist in GitHub. Stripped before passing inputs to Terraform.
+  import_id = try(local.caller_values.import_id, "")
+
   merged = merge(
     local.defaults,
-    local.caller_values,
+    { for k, v in local.caller_values : k => v if k != "import_id" },
     {
       rulesets   = merge(local.default_rulesets, try(local.caller_values.rulesets, {}))
       codeowners = concat(local.default_codeowners, try(local.caller_values.codeowners, []))
     }
   )
+}
+
+# Generates an OpenTofu import block when import_id is provided.
+# Needed for repos that already exist in GitHub and must be brought into IaC state.
+# Safe to leave permanently: OpenTofu ignores the block if the resource is already in state.
+generate "imports" {
+  path      = "imports.tf"
+  if_exists = "overwrite"
+  contents  = local.import_id != "" ? <<-EOF
+    import {
+      to = github_repository.default[0]
+      id = "${local.import_id}"
+    }
+  EOF : ""
 }
 
 terraform {
