@@ -150,6 +150,29 @@ terraform {
 inputs = local.merged
 ```
 
+### Adding dependency blocks between units
+
+When a unit needs outputs from another unit (e.g., a repo unit needing a team ID),
+add a `dependency` block. Always include `mock_outputs` so that `plan` works before
+the dependency has been applied for the first time:
+
+```hcl
+# units/<name>/terragrunt.hcl
+dependency "team" {
+  config_path = "../teams-platform"
+
+  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
+  mock_outputs = {
+    team_id   = "mock-team-id"
+    team_slug = "platform"
+  }
+}
+```
+
+Without `mock_outputs`, the plan step will fail on the first cycle because the
+dependency has no real outputs in state yet. `stack run` handles apply ordering
+automatically via the dependency DAG — no CI changes are needed.
+
 ### Running TFLint
 
 ```bash
