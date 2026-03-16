@@ -70,12 +70,12 @@ locals {
 generate "imports" {
   path      = "imports.tf"
   if_exists = "overwrite"
-  contents  = local.import_id != "" ? <<-EOF
-    import {
-      to = github_repository.default[0]
-      id = "${local.import_id}"
-    }
-  EOF : ""
+  contents = local.import_id != "" ? join("\n", [
+    "import {",
+    "  to = github_repository.default[0]",
+    "  id = \"${local.import_id}\"",
+    "}",
+  ]) : ""
 }
 
 terraform {
