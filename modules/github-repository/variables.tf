@@ -121,6 +121,12 @@ variable "labels" {
   nullable = false
 }
 
+variable "codeowners" {
+  description = "Lines for the .github/CODEOWNERS file. Each string is one pattern-to-owners entry. Last matching pattern wins (GitHub semantics)."
+  type        = list(string)
+  default     = []
+}
+
 variable "rulesets" {
   description = "A map of rulesets to configure for the repository"
   type = map(object({

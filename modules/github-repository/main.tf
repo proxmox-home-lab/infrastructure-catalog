@@ -25,10 +25,26 @@ resource "github_branch_default" "default" {
 }
 
 locals {
-  variables = var.enabled ? var.variables : {}
+  variables  = var.enabled ? var.variables : {}
   #   secrets   = var.enabled ? { for k, v in nonsensitive(var.secrets) : k => sensitive(v) } : {} // Migrate to Vault Secrets
-  labels   = var.enabled ? var.labels : {}
-  rulesets = var.enabled ? var.rulesets : {}
+  labels     = var.enabled ? var.labels : {}
+  rulesets   = var.enabled ? var.rulesets : {}
+  codeowners = var.enabled ? var.codeowners : []
+}
+
+resource "github_repository_file" "codeowners" {
+  count      = length(local.codeowners) > 0 ? 1 : 0
+  repository = join("", github_repository.default[*].name)
+  branch     = var.default_branch
+  file       = ".github/CODEOWNERS"
+  content    = join("\n", local.codeowners)
+
+  commit_message      = "chore: update CODEOWNERS [skip ci]"
+  commit_author       = "github-actions[bot]"
+  commit_email        = "github-actions[bot]@users.noreply.github.com"
+  overwrite_on_create = true
+
+  depends_on = [github_branch_default.default]
 }
 
 resource "github_actions_variable" "default" {

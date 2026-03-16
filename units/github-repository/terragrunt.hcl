@@ -17,9 +17,9 @@ locals {
   # Callers can override a ruleset by using the same key, or add new ones with a different key.
   default_rulesets = {
     default_branch_protection = {
-      name        = "default-branch-protection"
-      target      = "branch"
-      enforcement = "active"
+      name          = "default-branch-protection"
+      target        = "branch"
+      enforcement   = "active"
       bypass_actors = []
       conditions = {
         ref_name = {
@@ -32,7 +32,7 @@ locals {
         non_fast_forward = true
         pull_request = {
           dismiss_stale_reviews_on_push     = true
-          require_code_owner_review         = false
+          require_code_owner_review         = true
           require_last_push_approval        = false
           required_approving_review_count   = 1
           required_review_thread_resolution = false
@@ -41,13 +41,21 @@ locals {
     }
   }
 
+  # Org-standard CODEOWNERS baseline: CI/CD paths always require platform review,
+  # regardless of who owns the rest of the repo.
+  # Stack entries are appended after this baseline (last-match-wins in GitHub).
+  default_codeowners = [
+    "/.github/ @proxmox-home-lab/platform",
+  ]
+
   caller_values = try(values, {})
 
   merged = merge(
     local.defaults,
     local.caller_values,
     {
-      rulesets = merge(local.default_rulesets, try(local.caller_values.rulesets, {}))
+      rulesets   = merge(local.default_rulesets, try(local.caller_values.rulesets, {}))
+      codeowners = concat(local.default_codeowners, try(local.caller_values.codeowners, []))
     }
   )
 }
