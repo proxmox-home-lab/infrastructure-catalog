@@ -2,13 +2,8 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
-include "common" {
-  path   = find_in_parent_folders("common.hcl")
-  expose = true
-}
-
 locals {
-  repository_url = try(include.common.locals.repository_url, null)
+  repository_url = "github.com/proxmox-home-lab/infrastructure-catalog.git"
 
   defaults = {
     version      = "main"
