@@ -9,8 +9,8 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]{0,38}$", var.name))
-    error_message = "Repository name must be alphanumeric and can contain hyphens, but cannot start or end with a hyphen and must be between 1 and 39 characters long."
+    condition     = can(regex("^(\\.github|[a-zA-Z0-9][a-zA-Z0-9-]{0,38})$", var.name))
+    error_message = "Repository name must be alphanumeric with optional hyphens (1-39 chars), or the special org repo name '.github'."
   }
 }
 
