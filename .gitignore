@@ -1,0 +1,15 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+tfplan.binary
+*.tfplan
+
+# Terragrunt
+.terragrunt-cache/
+.terragrunt-stack/
+
+# Sensitive files
+*.env
+.vault_config/
