@@ -25,7 +25,8 @@ resource "github_branch_default" "default" {
 }
 
 locals {
-  variables  = var.enabled ? var.variables : {}
+  team_access = var.enabled ? var.team_access : {}
+  variables   = var.enabled ? var.variables : {}
   #   secrets   = var.enabled ? { for k, v in nonsensitive(var.secrets) : k => sensitive(v) } : {} // Migrate to Vault Secrets
   labels     = var.enabled ? var.labels : {}
   rulesets   = var.enabled ? var.rulesets : {}
@@ -45,6 +46,13 @@ resource "github_repository_file" "codeowners" {
   overwrite_on_create = true
 
   depends_on = [github_branch_default.default]
+}
+
+resource "github_team_repository" "access" {
+  for_each   = local.team_access
+  team_id    = each.key
+  repository = join("", github_repository.default[*].name)
+  permission = each.value
 }
 
 resource "github_actions_variable" "default" {

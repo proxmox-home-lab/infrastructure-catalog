@@ -65,12 +65,19 @@ locals {
   # for repos that already exist in GitHub. Stripped before passing inputs to Terraform.
   import_id = try(local.caller_values.import_id, "")
 
+  # Org-standard team access: platform team always gets push so CODEOWNERS entries work.
+  # Callers can add more teams; platform entry is merged last so it cannot be downgraded.
+  default_team_access = {
+    platform = "push"
+  }
+
   merged = merge(
     local.defaults,
     { for k, v in local.caller_values : k => v if k != "import_id" },
     {
-      rulesets   = merge(local.default_rulesets, try(local.caller_values.rulesets, {}))
-      codeowners = concat(local.default_codeowners, try(local.caller_values.codeowners, []))
+      rulesets    = merge(local.default_rulesets, try(local.caller_values.rulesets, {}))
+      codeowners  = concat(local.default_codeowners, try(local.caller_values.codeowners, []))
+      team_access = merge(try(local.caller_values.team_access, {}), local.default_team_access)
     }
   )
 }

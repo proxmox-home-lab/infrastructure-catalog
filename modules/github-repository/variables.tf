@@ -85,6 +85,18 @@ variable "has_wiki" {
   default     = false
 }
 
+variable "team_access" {
+  description = "Map of GitHub team slugs to their permission level (pull, triage, push, maintain, admin). Teams must have at least push to be valid CODEOWNERS."
+  type        = map(string)
+  default     = {}
+  nullable    = false
+
+  validation {
+    condition     = alltrue([for _, v in var.team_access : contains(["pull", "triage", "push", "maintain", "admin"], v)])
+    error_message = "Permission must be one of: pull, triage, push, maintain, admin."
+  }
+}
+
 variable "variables" {
   description = "Environment variables for the repository"
   type        = map(string)
