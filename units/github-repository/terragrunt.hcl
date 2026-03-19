@@ -22,14 +22,14 @@ locals {
       enforcement = "active"
       bypass_actors = [
         {
-          actor_type  = "Integration"
-          actor_id    = get_env("GITHUB_APP_INSTALLATION_ID", "0")
+          actor_type  = "OrganizationAdmin"
+          actor_id    = "0"
           bypass_mode = "always"
         },
         {
-          actor_type  = "OrganizationAdmin"
-          actor_id    = "0"
-          bypass_mode = "pull_request"
+          actor_type  = "Integration"
+          actor_id    = get_env("GITHUB_APP_INSTALLATION_ID", "0")
+          bypass_mode = "always"
         },
       ]
       conditions = {
