@@ -17,10 +17,21 @@ locals {
   # Callers can override a ruleset by using the same key, or add new ones with a different key.
   default_rulesets = {
     default_branch_protection = {
-      name          = "default-branch-protection"
-      target        = "branch"
-      enforcement   = "active"
-      bypass_actors = []
+      name        = "default-branch-protection"
+      target      = "branch"
+      enforcement = "active"
+      bypass_actors = [
+        {
+          actor_type  = "OrganizationAdmin"
+          actor_id    = "0"
+          bypass_mode = "always"
+        },
+        {
+          actor_type  = "Integration"
+          actor_id    = get_env("GITHUB_APP_ID", "0")
+          bypass_mode = "always"
+        },
+      ]
       conditions = {
         ref_name = {
           include = ["~DEFAULT_BRANCH"]
