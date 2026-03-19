@@ -28,7 +28,7 @@ locals {
         },
         {
           actor_type  = "Integration"
-          actor_id    = get_env("GITHUB_APP_INSTALLATION_ID", "0")
+          actor_id    = get_env("GITHUB_APP_ID", "0")
           bypass_mode = "always"
         },
       ]
